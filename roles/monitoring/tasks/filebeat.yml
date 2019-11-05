@@ -1,0 +1,39 @@
+---
+
+- name: Ensure filebeat is installed
+  win_chocolatey:
+    name: filebeat
+    version: "{{filebeat_version}}"
+    state: present
+
+- name: Download Filebeat OSS
+  win_get_url:
+    url: https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-oss-7.4.0-windows-x86_64.zip
+    dest: C:\filebeat.zip
+    force: True
+
+- name: Recursively decompress GZ files in ApplicationLogs.zip
+  win_unzip:
+    src: C:\filebeat.zip
+    dest: C:\filebeat
+    delete_archive: yes
+
+- name: Copy filebeat OSS
+  win_copy:
+    src: C:\filebeat\filebeat-7.4.0-windows-x86_64\
+    dest: C:\ProgramData\chocolatey\lib\filebeat\tools
+    remote_src: yes
+
+- name: Ensure main filebeat.yml is generated
+  win_template:
+    src: filebeat.yml.j2
+    dest: C:/ProgramData/chocolatey/lib/filebeat/tools/filebeat.yml
+
+- name: Ensure filebeat service is started
+  win_service: name=filebeat start_mode=auto state=started
+  notify: filebeat restart
+
+- name: Restart a service
+  win_service:
+    name: filebeat
+    state: restarted

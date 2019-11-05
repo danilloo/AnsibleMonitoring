@@ -1,0 +1,28 @@
+---
+- name: Install Package
+  win_package:
+    path: "https://s3.amazonaws.com/amazoncloudwatch-agent/{{ ansible_os_family | lower }}/amd64/latest/amazon-cloudwatch-agent.msi"
+    creates_service: '{{ aws_cw_agent_service }}'
+    
+- name: deploy windows agent configuration
+  win_template:
+    src: templates/amazon-cloudwatch-agent.json.j2
+    dest: C:/Program Files/Amazon/AmazonCloudWatchAgent/amazon-cloudwatch-agent.json
+    with_first_found:
+      - files:
+          - "{{ aws_cw_config_template_path }}"
+    tags:
+      - config
+    register: config
+
+- name: start windows cloudwatch agent
+  win_command: |
+        powershell.exe ./amazon-cloudwatch-agent-ctl.ps1 \
+            -a fetch-config \
+            -m {{ aws_cw_agent_type }} \
+            -c file:amazon-cloudwatch-agent.json \
+            -s
+  args:
+    chdir: "{{ aws_cw_root }}"
+    when: config is changed
+  when: ansible_os_family == "Windows"

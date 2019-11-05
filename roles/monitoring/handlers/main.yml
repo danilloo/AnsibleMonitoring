@@ -1,0 +1,8 @@
+---
+- name: restart-cw-agent-windows
+  win_service:
+    name: "{{ aws_cw_agent_service }}"
+    state: "restarted"
+
+- name: filebeat restart
+  win_service: name=filebeat state=restarted

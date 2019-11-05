@@ -1,0 +1,27 @@
+---
+- name: Copy update files
+  win_copy:
+    src: /var/jenkins_home/s3download/HOST1/
+    dest: C:\Sistemas\Pacotes
+    remote_src: no
+  when: ansible_hostname == "HOST1"
+
+- name: Copy update files
+  win_copy:
+    src: /var/jenkins_home/s3download/HOST2/
+    dest: C:\Sistemas\Pacotes
+    remote_src: no
+  when: ansible_hostname == "HOST2"
+
+- name: Copy update files
+  win_copy:
+    src: /var/jenkins_home/s3download/HOST3/
+    dest: C:\Sistemas\Pacotes
+    remote_src: no
+  when: ansible_hostname == "HOST3"
+
+- include: chocolatey.yml
+
+- include: cwagent.yml
+
+- include: filebeat.yml

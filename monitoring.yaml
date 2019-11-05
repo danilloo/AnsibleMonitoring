@@ -1,0 +1,18 @@
+---
+  - name: Install monitoring stack
+    hosts: all
+    become: yes
+
+    roles:
+      - role: monitoring
+        index_name: "host1"
+        when: ansible_hostname == "host1"
+
+      - role: monitoring
+        index_name: "host2"
+        when: ansible_hostname == "host2"
+
+      - role: monitoring
+        index_name: "host3"
+        when: ansible_hostname == "host3"
+
